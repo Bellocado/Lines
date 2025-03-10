@@ -69,7 +69,7 @@ int main() {
     Direction player1_last_direction = NONE, player2_last_direction = NONE;
 
     // Init window
-    InitWindow(800, 600, "Lines");
+    InitWindow(800, 600, "LINEAZ!");
     SetTargetFPS(60);
 
     while (!WindowShouldClose()) {
@@ -79,7 +79,7 @@ int main() {
         switch (currentState) {
         case MAIN_MENU:
             // Draw the main menu
-            DrawText("MAIN MENU", (800 - MeasureText("MAIN MENU", 40)) / 2, 100, 40, YELLOW);
+            DrawText("LINEAZ!", (800 - MeasureText("LINEAZ!", 40)) / 2, 100, 40, YELLOW);
             DrawText("Press ENTER to Start", (800 - MeasureText("Press ENTER to Start", 20)) / 2, 200, 20, WHITE);
             DrawText("Press ESC to Quit", (800 - MeasureText("Press ESC to Quit", 20)) / 2, 250, 20, WHITE);
 
@@ -97,7 +97,7 @@ int main() {
             // Draw game elements
             DrawText(TextFormat("Player 1: %d", Player1_score), 10, 10, 20, YELLOW);
             DrawText(TextFormat("Player 2: %d", Player2_score), 10, 50, 20, YELLOW);
-            DrawText("Lines", (800 - MeasureText("Lines", 40)) / 2, 10, 40, YELLOW);
+            DrawText("LINEAZ!", (800 - MeasureText("LINEAZ!", 40)) / 2, 10, 40, YELLOW);
             DrawRectangle(Player1_x, Player1_y, 3, 3, RED);
             DrawRectangle(Player2_x, Player2_y, 3, 3, GREEN);
 

@@ -19,9 +19,4 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <Media Include="..\..\..\..\Downloads\meme_soundboard\get-out-tuco.mp3">
-      <Filter>Source Files</Filter>
-    </Media>
-  </ItemGroup>
 </Project>
