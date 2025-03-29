@@ -17,7 +17,7 @@ struct Line {
 
 enum Direction { NONE, UP, DOWN, LEFT, RIGHT };
 
-enum GameState { MAIN_MENU, PLAYING, GAME_OVER };
+enum GameState { MAIN_MENU_1, PLAYING_BLITZ, GAME_OVER, MAIN_MENU_2 };
 
 bool DoLinesIntersect(Point p1, Point p2, Point p3, Point p4) {
     auto cross = [](Point p, Point q, Point r) {
@@ -59,9 +59,10 @@ int main() {
     srand(time(NULL));
 
     // Game State
-    GameState currentState = MAIN_MENU;
+    GameState currentState = MAIN_MENU_1;
 
     // Player and game variables
+    bool Player_turn = false;
     int Player1_x, Player1_y, Player1_x_dest, Player1_y_dest;
     int Player2_x, Player2_y, Player2_x_dest, Player2_y_dest;
     vector<Line> player1Lines, player2Lines;
@@ -77,23 +78,47 @@ int main() {
         ClearBackground(BLACK);
 
         switch (currentState) {
-        case MAIN_MENU:
+        case MAIN_MENU_2:
+            DrawText("LINEAZ!", (800 - MeasureText("LINEAZ!", 40)) / 2, 100, 40, YELLOW);
+            DrawText("The game is simple:", (800 - MeasureText("The game is simple:", 20)) / 2, 200, 20, WHITE);
+            DrawText("First PLayer to reach 10 pointz wins!", (800 - MeasureText("First PLayer to reach 10 pointz wins!", 20)) / 2, 230, 20, WHITE);
+            DrawText("Player 1 moves with wasd, Player 2 with ijkl.", (800 - MeasureText("Player 1 moves with wasd, Player 2 with ijkl.", 20)) / 2, 260, 20, WHITE);
+            DrawText("In 'Take Turns' mode, as the name suggests, you take turns.", (800 - MeasureText("In 'Take Turns' mode, as the name suggests, you take turns.", 20)) / 2, 290, 20, WHITE);
+            DrawText("In BLITZ! mode both players move simultaneously, so get ready for chaos!", (800 - MeasureText("In BLITZ! mode both players move simultaneously, so get ready for chaos!", 20)) / 2, 320, 20, WHITE);
+            DrawText("Return to the Main Menu woth o", (800 - MeasureText("Return to the Main Menu woth o", 20)) / 2, 350, 20, WHITE);
+            if (IsKeyPressed(KEY_O))
+            {
+                currentState = MAIN_MENU_1;
+            }
+            break;
+        case MAIN_MENU_1:
             // Draw the main menu
             DrawText("LINEAZ!", (800 - MeasureText("LINEAZ!", 40)) / 2, 100, 40, YELLOW);
-            DrawText("Press ENTER to Start", (800 - MeasureText("Press ENTER to Start", 20)) / 2, 200, 20, WHITE);
-            DrawText("Press ESC to Quit", (800 - MeasureText("Press ESC to Quit", 20)) / 2, 250, 20, WHITE);
+            DrawText("Press 1 to Play Blitz", (800 - MeasureText("Press 1 to Play Blitz", 20)) / 2, 200, 20, WHITE);
+            DrawText("Press 2 to Take Turns", (800 - MeasureText("Press 2 to Take Turns", 20)) / 2, 250, 20, WHITE);
+            DrawText("Press ESC to Quit", (800 - MeasureText("Press ESC to Quit", 20)) / 2, 300, 20, WHITE);
+            DrawText("Press o for Options", (800 - MeasureText("Press o for Options", 20)) / 2, 350, 20, WHITE);
+
 
             // Menu input
-            if (IsKeyPressed(KEY_ENTER)) {
-                currentState = PLAYING; // Start the game
+            if (IsKeyPressed(KEY_ONE)) {
+                currentState = PLAYING_BLITZ; // Start the game
                 ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
+            }
+            if (IsKeyPressed(KEY_TWO)) {
+                currentState = PLAYING_BLITZ; // Start the game
+                ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
+            }
+            if (IsKeyPressed(KEY_O))
+            {
+                currentState = MAIN_MENU_2;
             }
             if (IsKeyPressed(KEY_ESCAPE)) {
                 CloseWindow(); // Close the window
             }
             break;
 
-        case PLAYING:
+        case PLAYING_BLITZ:
             // Draw game elements
             DrawText(TextFormat("Player 1: %d", Player1_score), 10, 10, 20, YELLOW);
             DrawText(TextFormat("Player 2: %d", Player2_score), 10, 50, 20, YELLOW);
@@ -282,7 +307,7 @@ int main() {
 
             // Input for game over state
             if (IsKeyPressed(KEY_R)) {
-                currentState = MAIN_MENU; // Go back to the main menu
+                currentState = MAIN_MENU_1; // Go back to the main menu
                 Player1_score = 0;
                 Player2_score = 0;
                 ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
