@@ -18,6 +18,7 @@ struct Line {
 
 enum Direction { NONE, UP, DOWN, LEFT, RIGHT };
 
+
 enum GameState { MAIN_MENU_1, PLAYING_BLITZ, GAME_OVER, MAIN_MENU_2, PLAYING_TURN };
 
 bool DoLinesIntersect(Point p1, Point p2, Point p3, Point p4) {
@@ -71,6 +72,8 @@ int main() {
     vector<Line> player1Lines, player2Lines;
     int Player1_score = 0, Player2_score = 0;
     Direction player1_last_direction = NONE, player2_last_direction = NONE;
+    int turn_counter = 0;
+
 
     // Init window
     InitWindow(800, 600, "LINEAZ!");
@@ -129,6 +132,11 @@ int main() {
             DrawRectangle(Player1_x, Player1_y, 3, 3, RED);
             DrawRectangle(Player2_x, Player2_y, 3, 3, GREEN);
 
+            //fix player unable to move in one direction at start
+            if (turn_counter == 0) {
+                player1_last_direction = NONE;
+            }
+
             // Draw Player 1's lines
             for (auto& line : player1Lines)
                 DrawLine(line.start.x, line.start.y, line.end.x, line.end.y, RED);
@@ -139,168 +147,197 @@ int main() {
 
             // Player 1 movement and collision checks
             if (IsKeyPressed(KEY_W) && player1_last_direction != DOWN) {
-                Player1_y_dest = rand() % 300;
+                Player1_y_dest = rand() % 150;
                 Line newLine(Point(Player1_x, Player1_y), Point(Player1_x, Player1_y - Player1_y_dest));
                 player1Lines.push_back(newLine);
                 for (auto& line : player2Lines) {
                     if (DoLinesIntersectWithTolerance(Point(Player1_x, Player1_y), Point(Player1_x, Player1_y - Player1_y_dest), line.start, line.end)) {
                         Player2_score++;
+                        turn_counter = 0; // Reset turn counter
                         //WaitTime(2.0f);// Player 1 scores 1 point for each collision
                         ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                         if (Player2_score >= 10) {
                             currentState = GAME_OVER;
+                            turn_counter = 0;
                         }
                     }
                 }
                 Player1_y -= Player1_y_dest;
                 player1_last_direction = UP;
+                turn_counter++;
             }
 
             if (IsKeyPressed(KEY_S) && player1_last_direction != UP) {
-                Player1_y_dest = rand() % 300;
+                Player1_y_dest = rand() % 150;
                 Line newLine(Point(Player1_x, Player1_y), Point(Player1_x, Player1_y + Player1_y_dest));
                 player1Lines.push_back(newLine);
                 for (auto& line : player2Lines) {
                     if (DoLinesIntersectWithTolerance(Point(Player1_x, Player1_y), Point(Player1_x, Player1_y + Player1_y_dest), line.start, line.end)) {
                         Player2_score++;
                         //WaitTime(2.0f);
+                        turn_counter = 0; // Reset turn counter
                         ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                         if (Player2_score >= 10) {
                             currentState = GAME_OVER;
+                            turn_counter = 0;
                         }
                     }
                 }
                 Player1_y += Player1_y_dest;
                 player1_last_direction = DOWN;
+                turn_counter++;
             }
 
             if (IsKeyPressed(KEY_D) && player1_last_direction != LEFT) {
-                Player1_x_dest = rand() % 300;
+                Player1_x_dest = rand() % 150;
                 Line newLine(Point(Player1_x, Player1_y), Point(Player1_x + Player1_x_dest, Player1_y));
                 player1Lines.push_back(newLine);
                 for (auto& line : player2Lines) {
                     if (DoLinesIntersectWithTolerance(Point(Player1_x, Player1_y), Point(Player1_x + Player1_x_dest, Player1_y), line.start, line.end)) {
                         Player2_score++;
                         //WaitTime(2.0f);
+                        turn_counter = 0; // Reset turn counter
                         ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                         Player_turn = 1;
                         if (Player2_score >= 10) {
                             currentState = GAME_OVER;
+                            turn_counter = 0;
                         }
                     }
                 }
                 Player1_x += Player1_x_dest;
                 player1_last_direction = RIGHT;
+                turn_counter++;
             }
 
             if (IsKeyPressed(KEY_A) && player1_last_direction != RIGHT) {
-                Player1_x_dest = rand() % 300;
+                Player1_x_dest = rand() % 150;
                 Line newLine(Point(Player1_x, Player1_y), Point(Player1_x - Player1_x_dest, Player1_y));
                 player1Lines.push_back(newLine);
                 for (auto& line : player2Lines) {
                     if (DoLinesIntersectWithTolerance(Point(Player1_x, Player1_y), Point(Player1_x - Player1_x_dest, Player1_y), line.start, line.end)) {
                         Player2_score++;
                         //WaitTime(2.0f);
+                        turn_counter = 0; // Reset turn counter
                         ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                         if (Player2_score >= 10) {
                             currentState = GAME_OVER;
+                            turn_counter = 0;
                         }
                     }
                 }
                 Player1_x -= Player1_x_dest;
                 player1_last_direction = LEFT;
+                turn_counter++;
             }
 
             // Check for collisions with the wall for Player 1 (out of bounds)
             if (IsOutOfBounds(Player1_x, Player1_y)) {
                 Player2_score++;  // Player 2 scores 1 point for Player 1 going out of bounds
                 //WaitTime(2.0f);
+                turn_counter++;
+                turn_counter = 0; // Reset turn counter
                 ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                 if (Player2_score >= 10) {
                     currentState = GAME_OVER;
+                    turn_counter = 0;
                 }
             }
 
             // Player 2 movement and collision checks
             if (IsKeyPressed(KEY_I) && player2_last_direction != DOWN) {
-                Player2_y_dest = rand() % 300;
+                Player2_y_dest = rand() % 150;
                 Line newLine(Point(Player2_x, Player2_y), Point(Player2_x, Player2_y - Player2_y_dest));
                 player2Lines.push_back(newLine);
                 for (auto& line : player1Lines) {
                     if (DoLinesIntersectWithTolerance(Point(Player2_x, Player2_y), Point(Player2_x, Player2_y - Player2_y_dest), line.start, line.end)) {
                         Player1_score++;
                         //WaitTime(2.0f);
+                        turn_counter = 0; // Reset turn counter
                         ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                         if (Player1_score >= 10) {
                             currentState = GAME_OVER;
+                            turn_counter = 0;
                         }
                     }
                 }
                 Player2_y -= Player2_y_dest;
                 player2_last_direction = UP;
+                turn_counter++;
             }
 
             if (IsKeyPressed(KEY_K) && player2_last_direction != UP) {
-                Player2_y_dest = rand() % 300;
+                Player2_y_dest = rand() % 150;
                 Line newLine(Point(Player2_x, Player2_y), Point(Player2_x, Player2_y + Player2_y_dest));
                 player2Lines.push_back(newLine);
                 for (auto& line : player1Lines) {
                     if (DoLinesIntersectWithTolerance(Point(Player2_x, Player2_y), Point(Player2_x, Player2_y + Player2_y_dest), line.start, line.end)) {
                         Player1_score++;
                         //WaitTime(2.0f);
+                        turn_counter = 0; // Reset turn counter
                         ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                         if (Player1_score >= 10) {
                             currentState = GAME_OVER;
+                            turn_counter = 0;
                         }
                     }
                 }
                 Player2_y += Player2_y_dest;
                 player2_last_direction = DOWN;
+                turn_counter++;
             }
 
             if (IsKeyPressed(KEY_L) && player2_last_direction != LEFT) {
-                Player2_x_dest = rand() % 300;
+                Player2_x_dest = rand() % 150;
                 Line newLine(Point(Player2_x, Player2_y), Point(Player2_x + Player2_x_dest, Player2_y));
                 player2Lines.push_back(newLine);
                 for (auto& line : player1Lines) {
                     if (DoLinesIntersectWithTolerance(Point(Player2_x, Player2_y), Point(Player2_x + Player2_x_dest, Player2_y), line.start, line.end)) {
                         Player1_score++;
                         //WaitTime(2.0f);
+                        turn_counter = 0; // Reset turn counter
                         ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                         if (Player1_score >= 10) {
                             currentState = GAME_OVER;
+                            turn_counter = 0;
                         }
                     }
                 }
                 Player2_x += Player2_x_dest;
                 player2_last_direction = RIGHT;
+                turn_counter++;
             }
 
             if (IsKeyPressed(KEY_J) && player2_last_direction != RIGHT) {
-                Player2_x_dest = rand() % 300;
+                Player2_x_dest = rand() % 150;
                 Line newLine(Point(Player2_x, Player2_y), Point(Player2_x - Player2_x_dest, Player2_y));
                 player2Lines.push_back(newLine);
                 for (auto& line : player1Lines) {
                     if (DoLinesIntersectWithTolerance(Point(Player2_x, Player2_y), Point(Player2_x - Player2_x_dest, Player2_y), line.start, line.end)) {
                         Player1_score++;
                         //WaitTime(2.0f);
+                        turn_counter = 0; // Reset turn counter
                         ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                         if (Player1_score >= 10) {
                             currentState = GAME_OVER;
+                            turn_counter = 0;
                         }
                     }
                 }
                 Player2_x -= Player2_x_dest;
                 player2_last_direction = LEFT;
+                turn_counter++;
             }
 
             // Check for collisions with the wall for Player 2 (out of bounds)
             if (IsOutOfBounds(Player2_x, Player2_y)) {
                 Player1_score++;  // Player 1 scores 1 point for Player 2 going out of bounds
                 //WaitTime(2.0f);
+                turn_counter = 0;
                 ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                 if (Player1_score >= 10) {
                     currentState = GAME_OVER;
+                    turn_counter = 0;
                 }
             }
 
@@ -314,6 +351,11 @@ int main() {
             DrawRectangle(Player1_x, Player1_y, 3, 3, RED);
             DrawRectangle(Player2_x, Player2_y, 3, 3, GREEN);
 
+            //fix player unable to move in one direction at start
+            if (turn_counter == 0) {
+                player1_last_direction = NONE;
+            }
+
             // Draw Player 1's lines
             for (auto& line : player1Lines)
                 DrawLine(line.start.x, line.start.y, line.end.x, line.end.y, RED);
@@ -325,13 +367,14 @@ int main() {
             // Movement logic for Player 1's turn
             if (Player_turn == 1) {
                 if (IsKeyPressed(KEY_W) && player1_last_direction != DOWN) {
-                    Player1_y_dest = rand() % 300;
+                    Player1_y_dest = rand() % 150;
                     Line newLine(Point(Player1_x, Player1_y), Point(Player1_x, Player1_y - Player1_y_dest));
                     player1Lines.push_back(newLine);
                     for (auto& line : player2Lines) {
                         if (DoLinesIntersectWithTolerance(Point(Player1_x, Player1_y), Point(Player1_x, Player1_y - Player1_y_dest), line.start, line.end)) {
                             Player2_score++;
                             //WaitTime(2.0f);// Player 1 scores 1 point for each collision
+                            turn_counter = 0; // Reset turn counter
                             ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                             if (Player2_score >= 10) {
                                 currentState = GAME_OVER;
@@ -341,16 +384,18 @@ int main() {
                     Player1_y -= Player1_y_dest;
                     player1_last_direction = UP;
                     Player_turn = 0;
+                    turn_counter++;
                 }
 
                 if (IsKeyPressed(KEY_S) && player1_last_direction != UP) {
-                    Player1_y_dest = rand() % 300;
+                    Player1_y_dest = rand() % 150;
                     Line newLine(Point(Player1_x, Player1_y), Point(Player1_x, Player1_y + Player1_y_dest));
                     player1Lines.push_back(newLine);
                     for (auto& line : player2Lines) {
                         if (DoLinesIntersectWithTolerance(Point(Player1_x, Player1_y), Point(Player1_x, Player1_y + Player1_y_dest), line.start, line.end)) {
                             Player2_score++;
                             //WaitTime(2.0f);
+                            turn_counter = 0; // Reset turn counter
                             ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                             if (Player2_score >= 10) {
                                 currentState = GAME_OVER;
@@ -360,16 +405,18 @@ int main() {
                     Player1_y += Player1_y_dest;
                     player1_last_direction = DOWN;
                     Player_turn = 0;
+                    turn_counter++;
                 }
 
                 if (IsKeyPressed(KEY_D) && player1_last_direction != LEFT) {
-                    Player1_x_dest = rand() % 300;
+                    Player1_x_dest = rand() % 150;
                     Line newLine(Point(Player1_x, Player1_y), Point(Player1_x + Player1_x_dest, Player1_y));
                     player1Lines.push_back(newLine);
                     for (auto& line : player2Lines) {
                         if (DoLinesIntersectWithTolerance(Point(Player1_x, Player1_y), Point(Player1_x + Player1_x_dest, Player1_y), line.start, line.end)) {
                             Player2_score++;
                             //WaitTime(2.0f);
+                            turn_counter = 0; // Reset turn counter
                             ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                             if (Player2_score >= 10) {
                                 currentState = GAME_OVER;
@@ -379,16 +426,18 @@ int main() {
                     Player1_x += Player1_x_dest;
                     player1_last_direction = RIGHT;
                     Player_turn = 0;
+                    turn_counter++;
                 }
 
                 if (IsKeyPressed(KEY_A) && player1_last_direction != RIGHT) {
-                    Player1_x_dest = rand() % 300;
+                    Player1_x_dest = rand() % 150;
                     Line newLine(Point(Player1_x, Player1_y), Point(Player1_x - Player1_x_dest, Player1_y));
                     player1Lines.push_back(newLine);
                     for (auto& line : player2Lines) {
                         if (DoLinesIntersectWithTolerance(Point(Player1_x, Player1_y), Point(Player1_x - Player1_x_dest, Player1_y), line.start, line.end)) {
                             Player2_score++;
                             //WaitTime(2.0f);
+                            turn_counter = 0; // Reset turn counter
                             ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                             if (Player2_score >= 10) {
                                 currentState = GAME_OVER;
@@ -398,15 +447,18 @@ int main() {
                     Player1_x -= Player1_x_dest;
                     player1_last_direction = LEFT;
                     Player_turn = 0;
+                    turn_counter++;
                 }
 
                 // Check for collisions with the wall for Player 1 (out of bounds)
                 if (IsOutOfBounds(Player1_x, Player1_y)) {
                     Player2_score++;  // Player 2 scores 1 point for Player 1 going out of bounds
                     //WaitTime(2.0f);
+                    turn_counter = 0; // Reset turn counter
                     ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                     if (Player2_score >= 10) {
                         currentState = GAME_OVER;
+                        turn_counter = 0;
                     }
                 }
 
@@ -414,13 +466,14 @@ int main() {
             // Movement logic for Player 2's turn
             if (Player_turn == 0) {
                 if (IsKeyPressed(KEY_I) && player2_last_direction != DOWN) {
-                    Player2_y_dest = rand() % 300;
+                    Player2_y_dest = rand() % 150;
                     Line newLine(Point(Player2_x, Player2_y), Point(Player2_x, Player2_y - Player2_y_dest));
                     player2Lines.push_back(newLine);
                     for (auto& line : player1Lines) {
                         if (DoLinesIntersectWithTolerance(Point(Player2_x, Player2_y), Point(Player2_x, Player2_y - Player2_y_dest), line.start, line.end)) {
                             Player1_score++;
                             //WaitTime(2.0f);
+                            turn_counter = 0; // Reset turn counter
                             ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                             if (Player1_score >= 10) {
                                 currentState = GAME_OVER;
@@ -430,17 +483,19 @@ int main() {
                     Player2_y -= Player2_y_dest;
                     player2_last_direction = UP;
                     Player_turn = 1;
-                    
+                    turn_counter++;
+
                 }
 
                 if (IsKeyPressed(KEY_K) && player2_last_direction != UP) {
-                    Player2_y_dest = rand() % 300;
+                    Player2_y_dest = rand() % 150;
                     Line newLine(Point(Player2_x, Player2_y), Point(Player2_x, Player2_y + Player2_y_dest));
                     player2Lines.push_back(newLine);
                     for (auto& line : player1Lines) {
                         if (DoLinesIntersectWithTolerance(Point(Player2_x, Player2_y), Point(Player2_x, Player2_y + Player2_y_dest), line.start, line.end)) {
                             Player1_score++;
                             //WaitTime(2.0f);
+                            turn_counter = 0; // Reset turn counter
                             ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                             if (Player1_score >= 10) {
                                 currentState = GAME_OVER;
@@ -450,16 +505,18 @@ int main() {
                     Player2_y += Player2_y_dest;
                     player2_last_direction = DOWN;
                     Player_turn = 1;
+                    turn_counter++;
                 }
 
                 if (IsKeyPressed(KEY_L) && player2_last_direction != LEFT) {
-                    Player2_x_dest = rand() % 300;
+                    Player2_x_dest = rand() % 150;
                     Line newLine(Point(Player2_x, Player2_y), Point(Player2_x + Player2_x_dest, Player2_y));
                     player2Lines.push_back(newLine);
                     for (auto& line : player1Lines) {
                         if (DoLinesIntersectWithTolerance(Point(Player2_x, Player2_y), Point(Player2_x + Player2_x_dest, Player2_y), line.start, line.end)) {
                             Player1_score++;
                             //WaitTime(2.0f);
+                            turn_counter = 0; // Reset turn counter
                             ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                             if (Player1_score >= 10) {
                                 currentState = GAME_OVER;
@@ -469,16 +526,18 @@ int main() {
                     Player2_x += Player2_x_dest;
                     player2_last_direction = RIGHT;
                     Player_turn = 1;
+                    turn_counter++;
                 }
 
                 if (IsKeyPressed(KEY_J) && player2_last_direction != RIGHT) {
-                    Player2_x_dest = rand() % 300;
+                    Player2_x_dest = rand() % 150;
                     Line newLine(Point(Player2_x, Player2_y), Point(Player2_x - Player2_x_dest, Player2_y));
                     player2Lines.push_back(newLine);
                     for (auto& line : player1Lines) {
                         if (DoLinesIntersectWithTolerance(Point(Player2_x, Player2_y), Point(Player2_x - Player2_x_dest, Player2_y), line.start, line.end)) {
                             Player1_score++;
                             //WaitTime(2.0f);
+                            turn_counter = 0; // Reset turn counter
                             ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                             if (Player1_score >= 10) {
                                 currentState = GAME_OVER;
@@ -488,15 +547,19 @@ int main() {
                     Player2_x -= Player2_x_dest;
                     player2_last_direction = LEFT;
                     Player_turn = 1;
+                    turn_counter++;
                 }
 
                 // Check for collisions with the wall for Player 2 (out of bounds)
                 if (IsOutOfBounds(Player2_x, Player2_y)) {
                     Player1_score++;  // Player 1 scores 1 point for Player 2 going out of bounds
                     //WaitTime(2.0f);
+                    turn_counter = 0; // Reset turn counter
                     ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
                     if (Player1_score >= 10) {
                         currentState = GAME_OVER;
+                        turn_counter = 0;
+
                     }
                 }
             }
@@ -517,9 +580,9 @@ int main() {
                 if (Player1_score >= 10) {
                     currentState = GAME_OVER;
                 }*/
-        
 
-    break;
+
+            break;
 
         case GAME_OVER:
             // Determine the winner
@@ -539,6 +602,7 @@ int main() {
                 currentState = MAIN_MENU_1; // Go back to the main menu
                 Player1_score = 0;
                 Player2_score = 0;
+                turn_counter = 0;
                 ResetGame(Player1_x, Player1_y, Player2_x, Player2_y, player1Lines, player2Lines);
             }
             if (IsKeyPressed(KEY_ESCAPE)) {
