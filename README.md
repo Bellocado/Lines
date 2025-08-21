@@ -8,5 +8,6 @@ THE MODES:
 
 RELEASE 1.0.0 is out!
 
-https://github.com/Bellocado/Lines/releases/tag/v1.0.0
+https://github.com/Bellocado/Lines/releases/tag/v1.0.1
+
 
