@@ -6,7 +6,7 @@ THE MODES:
   TURNS mode:
     This mode is a lot more peacefull. It's basically the same as in blitz, but while one player moves, the other one's controlls are blocked.
 
-RELEASE 1.0.0 is out!
+RELEASE 1.0.1 is out!
 
 https://github.com/Bellocado/Lines/releases/tag/v1.0.1
 
