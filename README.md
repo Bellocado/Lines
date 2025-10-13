@@ -10,4 +10,6 @@ RELEASE 1.0.1 is out!
 
 https://github.com/Bellocado/Lines/releases/tag/v1.0.1
 
+You can also download this masterpiece on itch!
 
+https://bellocado.itch.io/lineaz
