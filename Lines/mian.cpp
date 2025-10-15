@@ -4,6 +4,12 @@
 #include <ctime>
 #include <iostream>
 
+// Add these lines at the top after includes
+Sound moveSound;
+Sound menuSound;
+Sound loseSound;
+bool soundsLoaded = false;
+
 using namespace std;
 
 // Constants
@@ -119,6 +125,7 @@ bool HandleMove(Player& mover, Player& opponent, Direction move_dir, Direction f
     mover.lines.push_back(Line(start, end));
     for (const auto& line : opponent.lines) {
         if (DoLinesIntersectWithTolerance(start, end, line.start, line.end)) {
+            PlaySound(loseSound); // Play lose sound on collision
             opponent.score++;
             ResetGame(mover, opponent);
             if (opponent.score >= WIN_SCORE) {
@@ -130,6 +137,7 @@ bool HandleMove(Player& mover, Player& opponent, Direction move_dir, Direction f
     mover.x = end.x;
     mover.y = end.y;
     mover.last_direction = move_dir;
+    PlaySound(moveSound); // Play move sound on successful move
     return false;
 }
 
@@ -137,6 +145,13 @@ int main() {
     srand(time(NULL));
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "LINEAZ!");
     SetTargetFPS(60);
+
+    // Initialize audio device and load sounds
+    InitAudioDevice();
+    moveSound = LoadSound("move.wav");
+    menuSound = LoadSound("menu.wav");
+    loseSound = LoadSound("lose.wav");
+    SetMasterVolume(1.0f);
 
     GameState currentState = MAIN_MENU_1;
     Player player1, player2;
@@ -158,6 +173,7 @@ int main() {
                 ResetGame(player1, player2);
                 Player_turn = 1;
                 turn_counter = 0;
+                PlaySound(menuSound); // Play menu sound
             }
             if (IsKeyPressed(KEY_TWO)) {
                 currentState = PLAYING_TURN;
@@ -165,11 +181,14 @@ int main() {
                 ResetGame(player1, player2);
                 Player_turn = 1;
                 turn_counter = 0;
+                PlaySound(menuSound); // Play menu sound
             }
             if (IsKeyPressed(KEY_O)) {
                 currentState = MAIN_MENU_2;
+                PlaySound(menuSound); // Play menu sound
             }
             if (IsKeyPressed(KEY_ESCAPE)) {
+                PlaySound(menuSound); // Play menu sound
                 CloseWindow();
             }
             break;
@@ -178,6 +197,7 @@ int main() {
             DrawOptionsMenu();
             if (IsKeyPressed(KEY_O)) {
                 currentState = MAIN_MENU_1;
+                PlaySound(menuSound); // Play menu sound
             }
             break;
 
@@ -200,11 +220,13 @@ int main() {
             if (IsOutOfBounds(player1.x, player1.y)) {
                 player2.score++;
                 ResetGame(player1, player2);
+                PlaySound(loseSound); // Play lose sound
                 if (player2.score >= WIN_SCORE) currentState = GAME_OVER;
             }
             if (IsOutOfBounds(player2.x, player2.y)) {
                 player1.score++;
                 ResetGame(player1, player2);
+                PlaySound(loseSound); // Play lose sound
                 if (player1.score >= WIN_SCORE) currentState = GAME_OVER;
             }
             break;
@@ -239,6 +261,7 @@ int main() {
                 if (IsOutOfBounds(player1.x, player1.y)) {
                     player2.score++;
                     ResetGame(player1, player2);
+                    PlaySound(loseSound); // Play lose sound
                     if (player2.score >= WIN_SCORE) currentState = GAME_OVER;
                 }
             } else {
@@ -269,6 +292,7 @@ int main() {
                 if (IsOutOfBounds(player2.x, player2.y)) {
                     player1.score++;
                     ResetGame(player1, player2);
+                    PlaySound(loseSound); // Play lose sound
                     if (player1.score >= WIN_SCORE) currentState = GAME_OVER;
                 }
             }
@@ -282,8 +306,10 @@ int main() {
                 ResetGame(player1, player2);
                 Player_turn = 1;
                 turn_counter = 0;
+                PlaySound(menuSound); // Play menu sound
             }
             if (IsKeyPressed(KEY_ESCAPE)) {
+                PlaySound(menuSound); // Play menu sound
                 CloseWindow();
             }
             break;
@@ -292,6 +318,14 @@ int main() {
         EndDrawing();
     }
 
+    // Unload sounds and close audio device before exiting
+    if (soundsLoaded) {
+        UnloadSound(moveSound);
+        UnloadSound(menuSound);
+        UnloadSound(loseSound);
+        CloseAudioDevice();
+    }
+
     CloseWindow();
-    return 0;
+    return 0;   
 }

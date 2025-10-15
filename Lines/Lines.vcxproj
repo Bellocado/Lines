@@ -137,6 +137,11 @@
   <ItemGroup>
     <ClCompile Include="mian.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\..\..\..\..\Downloads\lose.wav" />
+    <Media Include="..\..\..\..\..\Downloads\menu.wav" />
+    <Media Include="..\..\..\..\..\Downloads\move.wav" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
